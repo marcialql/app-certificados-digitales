@@ -14,8 +14,8 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.ts',
       manifest: {
-        name: 'Certificado Digital',
-        short_name: 'Certificado Digital',
+        name: 'Firma PDF',
+        short_name: 'Firma PDF',
         description: 'Firma tus PDF con tu certificado digital',
         lang: 'es',
         display: 'standalone',

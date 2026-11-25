@@ -8,21 +8,21 @@ describe('parsePushPayload', () => {
   })
 
   it('usa un título por defecto si falta o está vacío', () => {
-    expect(parsePushPayload(JSON.stringify({ body: 'Hola' }))).toEqual({ title: 'Certificado Digital', body: 'Hola' })
-    expect(parsePushPayload(JSON.stringify({ title: '  ', body: 'Hola' }))).toEqual({ title: 'Certificado Digital', body: 'Hola' })
+    expect(parsePushPayload(JSON.stringify({ body: 'Hola' }))).toEqual({ title: 'Firma PDF', body: 'Hola' })
+    expect(parsePushPayload(JSON.stringify({ title: '  ', body: 'Hola' }))).toEqual({ title: 'Firma PDF', body: 'Hola' })
   })
 
   it('sin datos devuelve un aviso genérico', () => {
-    expect(parsePushPayload(undefined)).toEqual({ title: 'Certificado Digital', body: '' })
-    expect(parsePushPayload('')).toEqual({ title: 'Certificado Digital', body: '' })
+    expect(parsePushPayload(undefined)).toEqual({ title: 'Firma PDF', body: '' })
+    expect(parsePushPayload('')).toEqual({ title: 'Firma PDF', body: '' })
   })
 
   it('texto que no es JSON se muestra como cuerpo', () => {
-    expect(parsePushPayload('Mensaje simple')).toEqual({ title: 'Certificado Digital', body: 'Mensaje simple' })
+    expect(parsePushPayload('Mensaje simple')).toEqual({ title: 'Firma PDF', body: 'Mensaje simple' })
   })
 
   it('ignora campos que no son texto', () => {
-    expect(parsePushPayload(JSON.stringify({ title: 5, body: { a: 1 } }))).toEqual({ title: 'Certificado Digital', body: '' })
+    expect(parsePushPayload(JSON.stringify({ title: 5, body: { a: 1 } }))).toEqual({ title: 'Firma PDF', body: '' })
   })
 })
 

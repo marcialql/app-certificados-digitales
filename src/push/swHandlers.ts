@@ -5,7 +5,7 @@ export interface PushMessage {
   body: string
 }
 
-const DEFAULT_TITLE = 'Certificado Digital'
+const DEFAULT_TITLE = 'Firma PDF'
 
 /** Interpreta el JSON {title, body} que envía server/notify.ts. */
 export function parsePushPayload(text: string | null | undefined): PushMessage {

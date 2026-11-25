@@ -1,4 +1,4 @@
-# Certificado Digital (PWA)
+# Firma PDF con certificado digital (PWA)
 
 PWA para firmar PDF con firma PAdES usando un certificado `.p12`/`.pfx`. Todo el
 procesado de PDF y certificados ocurre en el navegador; el servidor solo sirve la app
