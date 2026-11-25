@@ -36,7 +36,7 @@ export default function App() {
 
   return (
     <main>
-      <h1>Firma PDF</h1>
+      <h1>Certificado Digital</h1>
       <nav className="menu-principal">
         <button type="button" className="menu-boton" onClick={startSigning}>Firmar PDF</button>
         <button type="button" className="menu-boton" onClick={() => setView('sedes')}>Sedes electrónicas</button>
