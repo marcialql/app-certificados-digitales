@@ -17,7 +17,7 @@ npx vitest run          # pruebas unitarias (44)
 npm run build           # build de producción + service worker
 npm run lint            # oxlint
 npx playwright install chromium   # una vez, si no está instalado
-npx playwright test --trace off   # E2E en perfiles iPhone 14 y Pixel 7 (22)
+npx playwright test --trace off   # E2E en perfiles iPhone 14 y Pixel 7 (24)
 ```
 
 Para usar otro binario de Chromium en Playwright: `CHROMIUM_PATH=/ruta/al/binario npx playwright test`.
@@ -26,7 +26,7 @@ Para usar otro binario de Chromium en Playwright: `CHROMIUM_PATH=/ruta/al/binari
 
 | Tarea del plan | Estado |
 |---|---|
-| 1–10 (andamiaje, cifrado con PIN, PKCS#12, IndexedDB, firma PAdES, flujos, sedes, privacidad) | Implementadas; 44 pruebas unitarias y 22 E2E en verde |
+| 1–10 (andamiaje, cifrado con PIN, PKCS#12, IndexedDB, firma PAdES, flujos, sedes, privacidad) | Implementadas; 44 pruebas unitarias y 24 E2E en verde |
 | 5 verificación externa con OpenSSL / pdfsig | Documentada en `src/pdf/fixtures/README.md` |
 | 11 despliegue | Hecho: GitHub Pages. La guía de VPS y el servidor propio se han eliminado |
 | 12 aceptación en iPhone y Android reales | **Pendiente**: prueba manual. Los E2E cubren los perfiles iPhone 14 y Pixel 7 en emulación, no dispositivos reales |

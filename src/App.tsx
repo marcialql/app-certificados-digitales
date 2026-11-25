@@ -40,6 +40,7 @@ export default function App() {
         <button type="button" className="menu-boton" onClick={() => setView('ajustes')}>Ajustes</button>
       </nav>
       <img className="ilustracion-inicio" src="/ilustracion-certificado.svg" alt="" />
+      <p className="creditos-pie">Creado por Marcial Quesada López - Noviembre 2026</p>
     </main>
   )
 }
