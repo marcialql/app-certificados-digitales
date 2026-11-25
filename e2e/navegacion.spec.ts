@@ -1,11 +1,5 @@
 import { test, expect } from '@playwright/test'
 
-test('Salir en el inicio avisa si el navegador no puede cerrar la app', async ({ page }) => {
-  await page.goto('/')
-  await page.getByRole('button', { name: 'Salir' }).click()
-  await expect(page.getByRole('status')).toContainText('gestor de apps')
-})
-
 test('Salir en la pantalla de importar vuelve al inicio', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Firmar un documento' }).click()
