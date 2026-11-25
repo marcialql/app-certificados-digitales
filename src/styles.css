@@ -139,9 +139,9 @@ button:disabled {
 .ilustracion-inicio {
   display: block;
   width: 100%;
-  max-width: 320px;
+  max-width: 200px;
   height: auto;
-  margin: 32px auto 0;
+  margin: 20px auto 0;
 }
 
 .menu-boton {
@@ -369,4 +369,12 @@ section section li.sede-item {
   color: var(--color-texto-suave);
   opacity: 0.8;
   pointer-events: none;
+}
+
+/* Pantallas bajas: la ilustración se reduce para que el inicio quepa sin bajar */
+@media (max-height: 740px) {
+  .ilustracion-inicio {
+    max-width: 130px;
+    margin-top: 12px;
+  }
 }
