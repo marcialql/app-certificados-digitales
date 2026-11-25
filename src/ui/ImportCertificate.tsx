@@ -1,13 +1,14 @@
 import { useState, type FormEvent } from 'react'
 import { assertValidPin, sealBundle } from '../crypto/vault'
 import { loadSigner } from '../crypto/pkcs12'
-import { saveVault } from '../storage/certStore'
+import { addCert } from '../storage/certStore'
 import { encodeBundle } from './bundle'
 
 type Props = { onDone: () => void; onBack?: () => void }
 
 export default function ImportCertificate({ onDone, onBack }: Props) {
   const [file, setFile] = useState<File | null>(null)
+  const [nombre, setNombre] = useState('')
   const [password, setPassword] = useState('')
   const [pin, setPin] = useState('')
   const [pin2, setPin2] = useState('')
@@ -18,6 +19,7 @@ export default function ImportCertificate({ onDone, onBack }: Props) {
     e.preventDefault()
     setError('')
     if (!file) return setError('Elige el archivo de tu certificado (.p12 o .pfx).')
+    const etiqueta = nombre.trim() || file.name.replace(/\.(p12|pfx)$/i, '')
     try {
       assertValidPin(pin)
     } catch (err) {
@@ -29,7 +31,7 @@ export default function ImportCertificate({ onDone, onBack }: Props) {
       const p12 = new Uint8Array(await file.arrayBuffer())
       loadSigner(p12, password) // valida contraseña y vigencia
       const record = await sealBundle(encodeBundle(p12, password), pin)
-      await saveVault(record)
+      await addCert(etiqueta, record)
       onDone()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo importar el certificado.')
@@ -47,7 +49,19 @@ export default function ImportCertificate({ onDone, onBack }: Props) {
           <input
             type="file"
             accept=".p12,.pfx"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            onChange={(e) => {
+              const f = e.target.files?.[0] ?? null
+              setFile(f)
+              if (f && !nombre) setNombre(f.name.replace(/\.(p12|pfx)$/i, ''))
+            }}
+          />
+        </label>
+        <label>
+          Nombre para distinguirlo
+          <input
+            type="text"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
           />
         </label>
         <label>

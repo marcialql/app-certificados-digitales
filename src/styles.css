@@ -328,21 +328,6 @@ section section li.sede-item {
   color: var(--color-primario);
 }
 
-/* Créditos: pequeños, abajo a la derecha, como en la app de vales de riego */
-.creditos-pie {
-  position: fixed;
-  left: max(12px, env(safe-area-inset-left, 0px));
-  right: max(12px, env(safe-area-inset-right, 0px));
-  bottom: max(10px, env(safe-area-inset-bottom, 0px));
-  margin: 0;
-  text-align: center;
-  font-size: 11px;
-  line-height: 1.3;
-  color: var(--color-texto-suave);
-  opacity: 0.8;
-  pointer-events: none;
-}
-
 /* Pantallas bajas: la ilustración se reduce para que el inicio quepa sin bajar */
 @media (max-height: 740px) {
   .ilustracion-inicio {

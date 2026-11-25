@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { loadVault } from './storage/certStore'
+import { listCerts } from './storage/certStore'
 import ImportCertificate from './ui/ImportCertificate'
 import SignPdf from './ui/SignPdf'
 import Sedes from './ui/Sedes'
@@ -11,13 +11,13 @@ export default function App() {
   const [view, setView] = useState<View>('home')
 
   async function startSigning() {
-    let hasVault = false
+    let hasCert = false
     try {
-      hasVault = (await loadVault()) !== null
+      hasCert = (await listCerts()).length > 0
     } catch {
-      hasVault = false
+      hasCert = false
     }
-    setView(hasVault ? 'sign' : 'import')
+    setView(hasCert ? 'sign' : 'import')
   }
 
   if (view === 'import') return <main><ImportCertificate onDone={() => setView('sign')} onBack={() => setView('home')} /></main>
@@ -28,7 +28,7 @@ export default function App() {
   if (view === 'sedes') return <main><Sedes onBack={() => setView('home')} /></main>
 
   if (view === 'ajustes') {
-    return <main><Ajustes onBack={() => setView('home')} onDeleted={() => setView('import')} /></main>
+    return <main><Ajustes onBack={() => setView('home')} onImport={() => setView('import')} /></main>
   }
 
   return (
@@ -40,7 +40,6 @@ export default function App() {
         <button type="button" className="menu-boton" onClick={() => setView('ajustes')}>Ajustes</button>
       </nav>
       <img className="ilustracion-inicio" src="/ilustracion-certificado.svg" alt="" />
-      <p className="creditos-pie">Ilustración e iconos originales</p>
     </main>
   )
 }

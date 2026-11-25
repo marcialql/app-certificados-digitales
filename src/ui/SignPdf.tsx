@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { openBundle, WrongPinError } from '../crypto/vault'
 import { loadSigner } from '../crypto/pkcs12'
-import { loadVault } from '../storage/certStore'
+import { listCerts, type CertEntry } from '../storage/certStore'
 import { signPdf } from '../pdf/pades'
 import { decodeBundle } from './bundle'
 import PinDialog from './PinDialog'
@@ -29,6 +29,18 @@ export default function SignPdf({ onBack, onImport }: Props) {
   const [noCert, setNoCert] = useState(false)
   const [toShare, setToShare] = useState<File | null>(null)
   const [modo, setModo] = useState<'ultima' | 'todas'>('ultima')
+  const [certs, setCerts] = useState<CertEntry[]>([])
+  const [certId, setCertId] = useState('')
+
+  useEffect(() => {
+    listCerts()
+      .then((lista) => {
+        setCerts(lista)
+        setCertId((actual) => (lista.some((c) => c.id === actual) ? actual : lista[0]?.id ?? ''))
+        setNoCert(lista.length === 0)
+      })
+      .catch(() => setNoCert(true))
+  }, [])
 
   async function shareSigned() {
     if (!toShare) return
@@ -46,14 +58,18 @@ export default function SignPdf({ onBack, onImport }: Props) {
     setBusy(true)
     setPinError('')
     try {
-      const vault = await loadVault()
-      if (!vault) {
+      const lista = await listCerts()
+      setCerts(lista)
+      const elegido = lista.find((c) => c.id === certId)
+      if (!elegido) {
         setAsking(false)
-        setMessage('No hay ningún certificado guardado.')
-        setNoCert(true)
+        setMessage(lista.length === 0
+          ? 'No hay ningún certificado guardado.'
+          : 'El certificado elegido ya no está guardado. Elige otro.')
+        setNoCert(lista.length === 0)
         return
       }
-      const { p12, password } = decodeBundle(await openBundle(vault, pin))
+      const { p12, password } = decodeBundle(await openBundle(elegido.vault, pin))
       const signer = loadSigner(p12, password)
       const pdf = new Uint8Array(await file.arrayBuffer())
       const signed = await signPdf(pdf, signer, { modo })
@@ -96,6 +112,23 @@ export default function SignPdf({ onBack, onImport }: Props) {
           }}
         />
       </label>
+      {certs.length > 1 && (
+        <fieldset>
+          <legend>Certificado para firmar</legend>
+          {certs.map((c) => (
+            <label key={c.id}>
+              <input
+                type="radio"
+                name="certificado"
+                value={c.id}
+                checked={certId === c.id}
+                onChange={() => setCertId(c.id)}
+              />{' '}
+              {c.nombre}
+            </label>
+          ))}
+        </fieldset>
+      )}
       <fieldset>
         <legend>Cómo firmar el documento</legend>
         <label>
@@ -135,6 +168,9 @@ export default function SignPdf({ onBack, onImport }: Props) {
       <button type="button" className="boton-secundario" onClick={onBack}>Salir</button>
       {message && <p role="status">{message}</p>}
       {noCert && <button type="button" onClick={onImport}>Importar certificado</button>}
+      {!noCert && certs.length > 0 && (
+        <button type="button" className="boton-secundario" onClick={onImport}>Importar otro certificado</button>
+      )}
       {toShare && <button type="button" onClick={shareSigned}>Guardar o compartir</button>}
       {asking && (
         <PinDialog

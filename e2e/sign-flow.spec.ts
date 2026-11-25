@@ -18,6 +18,36 @@ async function importCert(page: Page) {
   await expect(page.getByRole('heading', { name: 'Firmar un documento' })).toBeVisible()
 }
 
+test('con varios certificados, se elige cuál firma y cada uno tiene su PIN', async ({ page }) => {
+  await importCert(page)
+  // Segundo certificado con otro nombre y otro PIN.
+  await page.getByRole('button', { name: 'Salir' }).click()
+  await page.getByRole('button', { name: 'Ajustes' }).click()
+  await page.getByRole('button', { name: 'Importar otro certificado' }).click()
+  await expect(page.getByRole('heading', { name: 'Importar certificado' })).toBeVisible()
+  await page.getByLabel('Archivo del certificado').setInputFiles(p12Path)
+  await page.getByLabel('Nombre para distinguirlo').fill('Empresa')
+  await page.getByLabel('Contraseña del certificado').fill('test')
+  await page.getByLabel('PIN nuevo', { exact: true }).fill('654321')
+  await page.getByLabel('Repite el PIN').fill('654321')
+  await page.getByRole('button', { name: 'Guardar certificado' }).click()
+  await expect(page.getByRole('heading', { name: 'Firmar un documento' })).toBeVisible()
+
+  await page.getByLabel('PDF a firmar').setInputFiles(pdfPath)
+  await expect(page.getByRole('radio', { name: 'Empresa' })).toBeVisible()
+  await page.getByRole('radio', { name: 'Empresa' }).check()
+  await page.getByRole('button', { name: 'Firmar', exact: true }).click()
+  // El PIN del primero no sirve para el segundo.
+  await page.getByLabel('PIN', { exact: true }).fill('123456')
+  await page.getByRole('button', { name: 'Aceptar' }).click()
+  await expect(page.getByText('PIN incorrecto')).toBeVisible()
+  await page.getByLabel('PIN', { exact: true }).fill('654321')
+  const downloadPromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Aceptar' }).click()
+  const download = await downloadPromise
+  expect(readFileSync(await download.path()).subarray(0, 4).toString('latin1')).toBe('%PDF')
+})
+
 test('importa el certificado y firma un PDF con el PIN', async ({ page }) => {
   await importCert(page)
   await page.getByLabel('PDF a firmar').setInputFiles(pdfPath)
