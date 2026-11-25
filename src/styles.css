@@ -292,3 +292,17 @@ section > p:first-of-type {
   background: var(--color-error);
   color: var(--color-primario-texto);
 }
+
+/* Foto de cada sede: la cabecera de su web, recortada */
+.sede-foto {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 10px;
+  border: 1px solid var(--color-borde);
+  margin-bottom: 12px;
+  background: var(--color-fondo);
+}

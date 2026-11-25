@@ -57,6 +57,14 @@ export default function Sedes({ onBack }: { onBack?: () => void }) {
           <ul>
             {items.map((s) => (
               <li key={s.id}>
+                {s.tipo !== 'buscador' && (
+                  <img
+                    className="sede-foto"
+                    src={`/sedes/${s.id}.png`}
+                    alt={`Página de inicio de ${s.nombre}`}
+                    loading="lazy"
+                  />
+                )}
                 <h3>{s.nombre}</h3>
                 <p>{s.descripcion}</p>
                 {s.tipo === 'buscador' ? (
