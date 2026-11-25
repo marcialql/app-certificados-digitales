@@ -42,8 +42,9 @@ test('con varios certificados, se elige cuál firma y cada uno tiene su PIN', as
   await page.getByRole('button', { name: 'Aceptar' }).click()
   await expect(page.getByText('PIN incorrecto')).toBeVisible()
   await page.getByLabel('PIN', { exact: true }).fill('654321')
-  const downloadPromise = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Aceptar' }).click()
+  const downloadPromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Guardar en el móvil' }).click()
   const download = await downloadPromise
   expect(readFileSync(await download.path()).subarray(0, 4).toString('latin1')).toBe('%PDF')
 })
@@ -53,8 +54,10 @@ test('importa el certificado y firma un PDF con el PIN', async ({ page }) => {
   await page.getByLabel('PDF a firmar').setInputFiles(pdfPath)
   await page.getByRole('button', { name: 'Firmar', exact: true }).click()
   await page.getByLabel('PIN', { exact: true }).fill('123456')
-  const downloadPromise = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Aceptar' }).click()
+  await expect(page.getByText('PDF firmado. ¿Qué quieres hacer?')).toBeVisible()
+  const downloadPromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Guardar en el móvil' }).click()
   const download = await downloadPromise
   const bytes = readFileSync(await download.path())
   expect(bytes.subarray(0, 4).toString('latin1')).toBe('%PDF')
@@ -96,7 +99,7 @@ test('si el móvil puede compartir archivos, ofrece la hoja nativa en vez de des
   let downloaded = false
   page.on('download', () => { downloaded = true })
   await page.getByRole('button', { name: 'Aceptar' }).click()
-  await page.getByRole('button', { name: 'Guardar o compartir' }).click()
+  await page.getByRole('button', { name: 'Enviar por WhatsApp o correo' }).click()
   await expect
     .poll(() => page.evaluate(() => (window as unknown as { __shared: unknown[] }).__shared.length))
     .toBe(1)

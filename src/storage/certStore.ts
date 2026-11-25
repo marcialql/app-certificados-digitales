@@ -35,7 +35,7 @@ function open(): Promise<IDBPDatabase<FirmaDB>> {
         if (vault) {
           await tx.objectStore(STORE).put({
             id: newId(),
-            nombre: 'Certificado 1',
+            nombre: '', // se completa con el nombre del certificado al desbloquearlo
             creado: new Date().toISOString(),
             vault,
           })
@@ -69,6 +69,13 @@ export function addCert(nombre: string, vault: VaultRecord): Promise<string> {
   return withDb(async (db) => {
     await db.put(STORE, { id, nombre, creado: new Date().toISOString(), vault })
     return id
+  })
+}
+
+export function renameCert(id: string, nombre: string): Promise<void> {
+  return withDb(async (db) => {
+    const entry = await db.get(STORE, id)
+    if (entry) await db.put(STORE, { ...entry, nombre })
   })
 }
 

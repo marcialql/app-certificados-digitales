@@ -71,7 +71,7 @@ describe('certStore', () => {
       req.onerror = () => reject(req.error)
     })
     const lista = await listCerts()
-    expect(lista.map((c) => c.nombre)).toEqual(['Certificado 1'])
+    expect(lista.map((c) => c.nombre)).toEqual([''])
     expect(plain(lista[0].vault)).toEqual(plain(record(7)))
     // Tras la migración, el store antiguo ya no existe.
     const db = await new Promise<IDBDatabase>((resolve, reject) => {

@@ -19,7 +19,6 @@ export default function ImportCertificate({ onDone, onBack }: Props) {
     e.preventDefault()
     setError('')
     if (!file) return setError('Elige el archivo de tu certificado (.p12 o .pfx).')
-    const etiqueta = nombre.trim() || file.name.replace(/\.(p12|pfx)$/i, '')
     try {
       assertValidPin(pin)
     } catch (err) {
@@ -29,9 +28,10 @@ export default function ImportCertificate({ onDone, onBack }: Props) {
     setBusy(true)
     try {
       const p12 = new Uint8Array(await file.arrayBuffer())
-      loadSigner(p12, password) // valida contraseña y vigencia
+      const signer = loadSigner(p12, password) // valida contraseña y vigencia
+      const cn = signer.certificate.subject.getField('CN')?.value
       const record = await sealBundle(encodeBundle(p12, password), pin)
-      await addCert(etiqueta, record)
+      await addCert(nombre.trim() || cn || file.name.replace(/\.(p12|pfx)$/i, ''), record)
       onDone()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo importar el certificado.')
@@ -52,12 +52,11 @@ export default function ImportCertificate({ onDone, onBack }: Props) {
             onChange={(e) => {
               const f = e.target.files?.[0] ?? null
               setFile(f)
-              if (f && !nombre) setNombre(f.name.replace(/\.(p12|pfx)$/i, ''))
             }}
           />
         </label>
         <label>
-          Nombre para distinguirlo
+          Nombre para distinguirlo (opcional)
           <input
             type="text"
             value={nombre}

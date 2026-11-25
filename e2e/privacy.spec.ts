@@ -63,8 +63,9 @@ test('ninguna petición contiene el PDF, el .p12, su contraseña ni el PIN', asy
   await page.getByLabel('PDF a firmar').setInputFiles(pdfPath)
   await page.getByRole('button', { name: 'Firmar', exact: true }).click()
   await page.getByLabel('PIN', { exact: true }).fill(PIN)
-  const downloadPromise = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Aceptar' }).click()
+  const downloadPromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Guardar en el móvil' }).click()
   await downloadPromise
 
   expect(seen.length).toBeGreaterThan(0)

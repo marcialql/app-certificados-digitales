@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { openBundle, WrongPinError } from '../crypto/vault'
 import { loadSigner } from '../crypto/pkcs12'
-import { listCerts, type CertEntry } from '../storage/certStore'
+import { listCerts, renameCert, type CertEntry } from '../storage/certStore'
 import { signPdf } from '../pdf/pades'
 import { decodeBundle } from './bundle'
 import PinDialog from './PinDialog'
@@ -27,7 +27,7 @@ export default function SignPdf({ onBack, onImport }: Props) {
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [noCert, setNoCert] = useState(false)
-  const [toShare, setToShare] = useState<File | null>(null)
+  const [firmado, setFirmado] = useState<File | null>(null)
   const [modo, setModo] = useState<'ultima' | 'todas'>('ultima')
   const [certs, setCerts] = useState<CertEntry[]>([])
   const [certId, setCertId] = useState('')
@@ -43,13 +43,13 @@ export default function SignPdf({ onBack, onImport }: Props) {
   }, [])
 
   async function shareSigned() {
-    if (!toShare) return
+    if (!firmado) return
     try {
-      await navigator.share({ files: [toShare], title: toShare.name })
+      await navigator.share({ files: [firmado], title: firmado.name })
     } catch (err) {
-      if (err instanceof DOMException && err.name === 'AbortError') return // el usuario cerró la hoja
-      download(toShare)
-      setMessage('PDF firmado. Se ha descargado el archivo.')
+      if (err instanceof DOMException && err.name === 'AbortError') return // el usuario cerró el menú
+      download(firmado)
+      setMessage('No se pudo enviar. El PDF se ha guardado en el móvil.')
     }
   }
 
@@ -71,19 +71,19 @@ export default function SignPdf({ onBack, onImport }: Props) {
       }
       const { p12, password } = decodeBundle(await openBundle(elegido.vault, pin))
       const signer = loadSigner(p12, password)
+      if (!elegido.nombre) {
+        // Certificados guardados antes de tener nombre: se toma el del propio certificado.
+        const cn = signer.certificate.subject.getField('CN')?.value
+        if (cn) {
+          await renameCert(elegido.id, cn)
+          setCerts((actual) => actual.map((c) => (c.id === elegido.id ? { ...c, nombre: cn } : c)))
+        }
+      }
       const pdf = new Uint8Array(await file.arrayBuffer())
       const signed = await signPdf(pdf, signer, { modo })
       const name = file.name.replace(/\.pdf$/i, '') + '-firmado.pdf'
-      const signedFile = new File([signed as BlobPart], name, { type: 'application/pdf' })
       setAsking(false)
-      if (chooseDelivery(navigator, signedFile) === 'share') {
-        // La hoja de compartir necesita un toque del usuario: se ofrece un botón.
-        setToShare(signedFile)
-        setMessage('PDF firmado. Pulsa «Guardar o compartir» para guardarlo.')
-      } else {
-        download(signedFile)
-        setMessage('PDF firmado. Se ha descargado el archivo.')
-      }
+      setFirmado(new File([signed as BlobPart], name, { type: 'application/pdf' }))
     } catch (err) {
       if (err instanceof WrongPinError) {
         setPinError('PIN incorrecto')
@@ -95,6 +95,8 @@ export default function SignPdf({ onBack, onImport }: Props) {
       setBusy(false)
     }
   }
+
+  const puedeEnviar = firmado !== null && chooseDelivery(navigator, firmado) === 'share'
 
   return (
     <section>
@@ -108,7 +110,7 @@ export default function SignPdf({ onBack, onImport }: Props) {
             setFile(e.target.files?.[0] ?? null)
             setMessage('')
             setNoCert(false)
-            setToShare(null)
+            setFirmado(null)
           }}
         />
       </label>
@@ -124,7 +126,7 @@ export default function SignPdf({ onBack, onImport }: Props) {
                 checked={certId === c.id}
                 onChange={() => setCertId(c.id)}
               />{' '}
-              {c.nombre}
+              {c.nombre || 'Certificado sin nombre'}
             </label>
           ))}
         </fieldset>
@@ -158,7 +160,7 @@ export default function SignPdf({ onBack, onImport }: Props) {
         onClick={() => {
           setMessage('')
           setNoCert(false)
-          setToShare(null)
+          setFirmado(null)
           setPinError('')
           setAsking(true)
         }}
@@ -168,7 +170,22 @@ export default function SignPdf({ onBack, onImport }: Props) {
       <button type="button" className="boton-secundario" onClick={onBack}>Salir</button>
       {message && <p role="status">{message}</p>}
       {noCert && <button type="button" onClick={onImport}>Importar certificado</button>}
-      {toShare && <button type="button" onClick={shareSigned}>Guardar o compartir</button>}
+      {firmado && (
+        <div className="entrega" role="group" aria-label="Qué hacer con el PDF firmado">
+          <p role="status">PDF firmado. ¿Qué quieres hacer?</p>
+          <button type="button" className="boton-grande" onClick={() => download(firmado)}>
+            Guardar en el móvil
+          </button>
+          {puedeEnviar && (
+            <button type="button" className="boton-grande" onClick={shareSigned}>
+              Enviar por WhatsApp o correo
+            </button>
+          )}
+          {puedeEnviar && (
+            <p className="ayuda">Se abrirá el menú del móvil: elige WhatsApp o Correo.</p>
+          )}
+        </div>
+      )}
       {asking && (
         <PinDialog
           onSubmit={handlePin}

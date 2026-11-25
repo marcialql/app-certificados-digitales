@@ -328,6 +328,24 @@ section section li.sede-item {
   color: var(--color-primario);
 }
 
+/* Entrega del PDF firmado: botones grandes y frases cortas */
+.entrega {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.boton-grande {
+  min-height: 56px;
+  font-size: 1.15rem;
+  width: 100%;
+}
+
+.ayuda {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
 /* Pantallas bajas: la ilustración se reduce para que el inicio quepa sin bajar */
 @media (max-height: 740px) {
   .ilustracion-inicio {

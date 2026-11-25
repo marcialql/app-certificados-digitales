@@ -47,7 +47,7 @@ export default function Ajustes({ onBack, onImport }: Props) {
         <ul className="lista-certificados">
           {certs.map((c) => (
             <li key={c.id}>
-              <span>{c.nombre}</span>{' '}
+              <span>{c.nombre || 'Certificado sin nombre'}</span>{' '}
               <button
                 type="button"
                 className="boton-peligro"
@@ -62,7 +62,7 @@ export default function Ajustes({ onBack, onImport }: Props) {
       )}
       {aBorrar && (
         <div role="alertdialog" aria-label="Confirmar borrado">
-          <p>¿Borrar «{aBorrar.nombre}» de este móvil? Tendrás que importarlo otra vez para firmar con él.</p>
+          <p>¿Borrar «{aBorrar.nombre || 'este certificado'}» de este móvil? Tendrás que importarlo otra vez para firmar con él.</p>
           <button type="button" className="boton-peligro" disabled={busy} onClick={() => handleDelete(aBorrar.id)}>Sí, borrar</button>
           <button type="button" className="boton-secundario" disabled={busy} onClick={() => setConfirmId(null)}>Cancelar</button>
         </div>

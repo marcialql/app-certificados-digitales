@@ -33,7 +33,7 @@ test('Ajustes borra un certificado tras confirmar y firmar vuelve a pedir import
   // Confirmar borra y deja la lista vacía.
   await page.getByRole('button', { name: 'Ajustes' }).click()
   await page.getByRole('button', { name: 'Borrar', exact: true }).click()
-  await expect(page.getByText('¿Borrar «test-ok» de este móvil?')).toBeVisible()
+  await expect(page.getByText('¿Borrar «Titular de Prueba test-ok» de este móvil?')).toBeVisible()
   await page.getByRole('button', { name: 'Sí, borrar' }).click()
   await expect(page.getByText('No hay certificados guardados en este móvil.')).toBeVisible()
 
