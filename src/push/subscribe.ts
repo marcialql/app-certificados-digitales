@@ -6,11 +6,14 @@ function urlBase64ToUint8Array(base64: string): Uint8Array<ArrayBuffer> {
   return out
 }
 
+// En GitHub Pages la API vive en otro host; en local, la misma origen (cadena vacía).
+const API = (import.meta.env.VITE_API_BASE as string | undefined) ?? ''
+
 export async function enableNotifications(): Promise<void> {
   const permission = await Notification.requestPermission()
   if (permission !== 'granted') throw new Error('Permiso de avisos no concedido')
 
-  const keyRes = await fetch('/api/vapid-key')
+  const keyRes = await fetch(`${API}/api/vapid-key`)
   if (!keyRes.ok) throw new Error('No se pudo obtener la clave de avisos')
   const { publicKey } = (await keyRes.json()) as { publicKey: string }
 
@@ -23,7 +26,7 @@ export async function enableNotifications(): Promise<void> {
   // Solo se envía la suscripción (dirección y claves), nada más.
   const { endpoint, keys } = sub.toJSON() as { endpoint: string; keys: { p256dh: string; auth: string } }
   try {
-    const res = await fetch('/api/subscribe', {
+    const res = await fetch(`${API}/api/subscribe`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ endpoint, keys: { p256dh: keys.p256dh, auth: keys.auth } }),

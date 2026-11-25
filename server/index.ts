@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import express from 'express'
 import helmet from 'helmet'
 import { setVapidDetails } from 'web-push'
+import { allowedOriginsFrom, corsHeaders } from './cors.ts'
 import { notifyAll } from './notify.ts'
 import { addSubscription } from './subscriptions.ts'
 
@@ -33,8 +34,20 @@ app.disable('x-powered-by')
 app.use(
   helmet({
     hsts: { maxAge: 31536000, includeSubDomains: true },
+    // La PWA vive en otro origen (GitHub Pages) y consulta esta API.
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
   }),
 )
+const allowedOrigins = allowedOriginsFrom()
+app.use((req, res, next) => {
+  const headers = corsHeaders(req.get('origin'), allowedOrigins)
+  if (headers) res.set(headers)
+  if (req.method === 'OPTIONS') {
+    res.status(headers ? 204 : 403).end()
+    return
+  }
+  next()
+})
 app.use(express.json({ limit: '10kb' }))
 
 app.get('/api/vapid-key', (_req, res) => {

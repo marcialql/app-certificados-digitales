@@ -1,0 +1,19 @@
+# API de avisos de firma PDF, en el puerto 8443 del VPS.
+# Usa red del host (network_mode: host) para llegar a 127.0.0.1:3000 (servicio ionos-app).
+{
+	admin off
+	auto_https disable_redirects
+}
+
+api.marcialql.es:8443 {
+	tls {
+		dns ionos {env.IONOS_API_TOKEN}
+	}
+	encode gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		-Server
+	}
+	reverse_proxy 127.0.0.1:3000
+}

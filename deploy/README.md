@@ -1,13 +1,13 @@
 # Despliegue en el VPS de IONOS (guía del administrador)
 
-Destino: https://certificados.marcialql.es, VPS IONOS con IP 217.154.80.225.
+Destino: https://certificados.marcialql.es, VPS IONOS (IP en la configuración privada del administrador).
 Esta carpeta solo contiene configuración; no hay secretos en el repositorio.
 
 Decisión de arquitectura: Nginx hace proxy de todo (`/` y `/api/`) hacia el
 proceso Node en 127.0.0.1:3000, que sirve `dist/` y la API (`server/index.ts`).
 
 ## 1. DNS
-Crear un registro A: `certificados.marcialql.es` -> `217.154.80.225`.
+Crear un registro A: `certificados.marcialql.es` -> la IP del VPS.
 
 ## 2. Requisitos en el VPS
 ```
