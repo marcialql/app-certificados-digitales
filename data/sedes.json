@@ -1,0 +1,60 @@
+[
+  {
+    "id": "ayuntamientos",
+    "tipo": "buscador",
+    "nombre": "Ayuntamientos",
+    "descripcion": "Escribe el nombre de tu municipio y te llevamos a la sede electrónica de su ayuntamiento.",
+    "categoria": "Ayuntamientos",
+    "plantilla": "https://duckduckgo.com/?q=sede+electr%C3%B3nica+ayuntamiento+{municipio}"
+  },
+  {
+    "id": "aeat",
+    "tipo": "enlace",
+    "nombre": "Agencia Tributaria",
+    "descripcion": "Impuestos, declaraciones de la renta, IVA y notificaciones de Hacienda.",
+    "categoria": "Impuestos",
+    "url": "https://sede.agenciatributaria.gob.es/"
+  },
+  {
+    "id": "seg-social",
+    "nombre": "Seguridad Social",
+    "descripcion": "Carpeta ciudadana, vida laboral, cita previa para pensiones y notificaciones.",
+    "categoria": "Trabajo y Seguridad Social",
+    "url": "https://sede.seg-social.gob.es/"
+  },
+  {
+    "id": "sepe",
+    "nombre": "SEPE",
+    "descripcion": "Prestaciones por desempleo y procedimientos de empleo.",
+    "categoria": "Trabajo y Seguridad Social",
+    "url": "https://sede.sepe.gob.es/"
+  },
+  {
+    "id": "dgt",
+    "nombre": "DGT",
+    "descripcion": "Permisos de conducir, vehículos, pago de multas y puntos del carné.",
+    "categoria": "Tráfico y vehículos",
+    "url": "https://sede.dgt.gob.es/es/"
+  },
+  {
+    "id": "catastro",
+    "nombre": "Catastro",
+    "descripcion": "Consulta de inmuebles, referencia catastral y valores de referencia.",
+    "categoria": "Inmuebles",
+    "url": "https://www.sedecatastro.gob.es/"
+  },
+  {
+    "id": "fnmt",
+    "nombre": "FNMT — Certificados",
+    "descripcion": "Información sobre el certificado electrónico de ciudadano y su renovación.",
+    "categoria": "Certificados",
+    "url": "https://www.sede.fnmt.gob.es/"
+  },
+  {
+    "id": "administracion",
+    "nombre": "Punto de Acceso General",
+    "descripcion": "Puerta de entrada a trámites de todas las administraciones españolas.",
+    "categoria": "General",
+    "url": "https://administracion.gob.es/"
+  }
+]
