@@ -1,13 +1,5 @@
 [
   {
-    "id": "ayuntamientos",
-    "tipo": "buscador",
-    "nombre": "Ayuntamientos",
-    "descripcion": "Escribe el nombre de tu municipio y te llevamos a la sede electrónica de su ayuntamiento.",
-    "categoria": "Ayuntamientos",
-    "plantilla": "https://duckduckgo.com/?q=sede+electr%C3%B3nica+ayuntamiento+{municipio}"
-  },
-  {
     "id": "aeat",
     "tipo": "enlace",
     "nombre": "Agencia Tributaria",
@@ -56,5 +48,13 @@
     "descripcion": "Puerta de entrada a trámites de todas las administraciones españolas.",
     "categoria": "General",
     "url": "https://administracion.gob.es/"
+  },
+  {
+    "id": "ayuntamientos",
+    "tipo": "buscador",
+    "nombre": "Ayuntamientos",
+    "descripcion": "Escribe el nombre de tu municipio y te llevamos a la sede electrónica de su ayuntamiento.",
+    "categoria": "Ayuntamientos",
+    "plantilla": "https://duckduckgo.com/?q=sede+electr%C3%B3nica+ayuntamiento+{municipio}"
   }
 ]
