@@ -28,6 +28,7 @@ export default function SignPdf({ onBack, onImport }: Props) {
   const [busy, setBusy] = useState(false)
   const [noCert, setNoCert] = useState(false)
   const [toShare, setToShare] = useState<File | null>(null)
+  const [modo, setModo] = useState<'ultima' | 'todas'>('ultima')
 
   async function shareSigned() {
     if (!toShare) return
@@ -55,7 +56,7 @@ export default function SignPdf({ onBack, onImport }: Props) {
       const { p12, password } = decodeBundle(await openBundle(vault, pin))
       const signer = loadSigner(p12, password)
       const pdf = new Uint8Array(await file.arrayBuffer())
-      const signed = await signPdf(pdf, signer)
+      const signed = await signPdf(pdf, signer, { modo })
       const name = file.name.replace(/\.pdf$/i, '') + '-firmado.pdf'
       const signedFile = new File([signed as BlobPart], name, { type: 'application/pdf' })
       setAsking(false)
@@ -81,7 +82,7 @@ export default function SignPdf({ onBack, onImport }: Props) {
 
   return (
     <section>
-      <h2>Firmar PDF</h2>
+      <h2>Firmar un documento</h2>
       <label>
         PDF a firmar
         <input
@@ -95,6 +96,29 @@ export default function SignPdf({ onBack, onImport }: Props) {
           }}
         />
       </label>
+      <fieldset>
+        <legend>Cómo firmar el documento</legend>
+        <label>
+          <input
+            type="radio"
+            name="modo"
+            value="ultima"
+            checked={modo === 'ultima'}
+            onChange={() => setModo('ultima')}
+          />{' '}
+          Solo en la última página, junto al pie de firma
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="modo"
+            value="todas"
+            checked={modo === 'todas'}
+            onChange={() => setModo('todas')}
+          />{' '}
+          En todas las hojas (en el lateral) y al final, junto al pie de firma
+        </label>
+      </fieldset>
       <button
         type="button"
         disabled={!file}

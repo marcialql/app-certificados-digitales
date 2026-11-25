@@ -7,7 +7,7 @@ const pdfPath = fileURLToPath(new URL('../src/pdf/fixtures/two-page.pdf', import
 
 async function importCert(page: Page) {
   await page.goto('/')
-  await page.getByRole('button', { name: 'Firmar PDF' }).click()
+  await page.getByRole('button', { name: 'Firmar un documento' }).click()
   // Sin certificado guardado: se redirige a la importación.
   await expect(page.getByRole('heading', { name: 'Importar certificado' })).toBeVisible()
   await page.getByLabel('Archivo del certificado').setInputFiles(p12Path)
@@ -15,7 +15,7 @@ async function importCert(page: Page) {
   await page.getByLabel('PIN nuevo', { exact: true }).fill('123456')
   await page.getByLabel('Repite el PIN').fill('123456')
   await page.getByRole('button', { name: 'Guardar certificado' }).click()
-  await expect(page.getByRole('heading', { name: 'Firmar PDF' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Firmar un documento' })).toBeVisible()
 }
 
 test('importa el certificado y firma un PDF con el PIN', async ({ page }) => {

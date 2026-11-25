@@ -7,6 +7,7 @@ import {
   PDFName,
   PDFNumber,
   PDFObject,
+  PDFPage,
   PDFRef,
   PDFString,
   StandardFontEmbedder,
@@ -34,6 +35,9 @@ export const SIGNATURE_HEX_LENGTH = 32768
 
 const DEFAULT_SIZE: [number, number] = [180, 60]
 const DEFAULT_MARGIN = 36
+/** Sello lateral (modo 'todas'): tira vertical de 18 × 240 pt, a 8 pt del borde izquierdo. */
+const SIDE_SIZE: [number, number] = [18, 240]
+const SIDE_MARGIN = 8
 const BYTE_RANGE_PLACEHOLDER = '[0 0000000000 0000000000 0000000000]'
 const OID_SIGNING_CERTIFICATE_V2 = '1.2.840.113549.1.9.16.2.47'
 
@@ -51,6 +55,11 @@ export type SignPdfOptions = {
   rect?: [number, number, number, number]
   /** Motivo de la firma (se guarda en /Reason y se muestra en el sello). */
   reason?: string
+  /**
+   * 'ultima' (por defecto): sello solo en la última página, junto al pie de firma.
+   * 'todas': además, un sello lateral en cada hoja.
+   */
+  modo?: 'ultima' | 'todas'
 }
 
 const asn1 = forge.asn1
@@ -291,6 +300,21 @@ function appearanceContent(font: StandardFontEmbedder, w: number, h: number, lin
   return ops.join('\n')
 }
 
+/** Texto del sello lateral: una sola línea, girada 90° para leerla de abajo arriba. */
+function sideAppearanceContent(font: StandardFontEmbedder, w: number, h: number, text: string): string {
+  const size = 7
+  const line = fitText(font, winAnsiSafe(font, text), size, h - 12)
+  return [
+    'q 0.12 0.31 0.47 RG 0.8 w',
+    `0.4 0.4 ${(w - 0.8).toFixed(2)} ${(h - 0.8).toFixed(2)} re S Q`,
+    'BT 0.1 0.1 0.1 rg',
+    `/F1 ${size.toFixed(2)} Tf`,
+    `0 1 -1 0 ${(w - 5).toFixed(2)} 6 Tm`,
+    `${font.encodeText(line).toString()} Tj`,
+    'ET',
+  ].join('\n')
+}
+
 // ---------------------------------------------------------------- firma
 
 export async function signPdf(pdf: Uint8Array, signer: Signer, opts: SignPdfOptions = {}): Promise<Uint8Array> {
@@ -427,6 +451,53 @@ export async function signPdf(pdf: Uint8Array, signer: Signer, opts: SignPdfOpti
   updates.set(widgetRef, widget)
   updates.set(apRef, ap)
   updates.set(fontRef, ctx.lookup(fontRef) as PDFObject)
+
+  // --- sellos laterales en cada hoja (modo 'todas'): anotaciones de sello, no campos de firma
+  const addAnnot = (p: PDFPage, ref: PDFRef) => {
+    const raw = p.node.get(PDFName.of('Annots'))
+    if (raw instanceof PDFRef) {
+      const arr = ctx.lookup(raw, PDFArray)
+      arr.push(ref)
+      updates.set(raw, arr)
+    } else if (raw instanceof PDFArray) {
+      raw.push(ref)
+      updates.set(p.ref, p.node)
+    } else {
+      p.node.set(PDFName.of('Annots'), ctx.obj([ref]))
+      updates.set(p.ref, p.node)
+    }
+  }
+  if (opts.modo === 'todas') {
+    const sideAp = ctx.stream(
+      sideAppearanceContent(font, SIDE_SIZE[0], SIDE_SIZE[1], `Firmado digitalmente por ${cn}. Fecha: ${humanDate(now)}`),
+      {
+        Type: 'XObject',
+        Subtype: 'Form',
+        BBox: [0, 0, SIDE_SIZE[0], SIDE_SIZE[1]],
+        Resources: { Font: { F1: fontRef } },
+      },
+    )
+    const sideApRef = ctx.nextRef()
+    ctx.assign(sideApRef, sideAp)
+    updates.set(sideApRef, sideAp)
+    for (let i = 0; i < pageCount; i++) {
+      const p = doc.getPage(i)
+      const b = p.getMediaBox()
+      const y0 = b.y + (b.height - SIDE_SIZE[1]) / 2
+      const stampRef = ctx.nextRef()
+      const stamp = ctx.obj({
+        Type: 'Annot',
+        Subtype: 'Stamp',
+        F: 4, // Print
+        P: p.ref,
+        Rect: [b.x + SIDE_MARGIN, y0, b.x + SIDE_MARGIN + SIDE_SIZE[0], y0 + SIDE_SIZE[1]],
+        AP: { N: sideApRef },
+      })
+      ctx.assign(stampRef, stamp)
+      updates.set(stampRef, stamp)
+      addAnnot(p, stampRef)
+    }
+  }
 
   // --- diccionario /Sig (texto propio para conocer las posiciones exactas)
   const sigDictText =

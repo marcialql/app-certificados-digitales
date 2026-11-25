@@ -268,6 +268,25 @@ describe('signPdf', () => {
     expect(Buffer.from(out.subarray(0, original.length)).equals(Buffer.from(original))).toBe(true)
   })
 
+  it('modo por defecto (última): ningún sello lateral, solo el pie de firma', async () => {
+    const out = await signPdf(fx('two-page.pdf'), signer)
+    expect(latin1(out).match(/\/Subtype \/Stamp/g)?.length ?? 0).toBe(0)
+  })
+
+  it("modo 'todas': un sello lateral en cada hoja, además del pie de firma", async () => {
+    const out = await signPdf(fx('two-page.pdf'), signer, { modo: 'todas' })
+    const text = latin1(out)
+    expect(text.match(/\/Subtype \/Stamp/g)?.length ?? 0).toBe(2)
+    expect(text.match(/\/Subtype \/Widget/g)?.length ?? 0).toBe(1)
+    // El PDF sigue siendo legible y cada hoja tiene su sello en /Annots
+    const doc = await PDFDocument.load(out)
+    for (const page of doc.getPages()) {
+      const annots = page.node.lookup(PDFName.of('Annots'), PDFArray)
+      const subtypes = annots.asArray().map((r) => (doc.context.lookup(r, PDFDict)).get(PDFName.of('Subtype'))?.toString())
+      expect(subtypes).toContain('/Stamp')
+    }
+  })
+
   it('actualización incremental: conserva los bytes originales y la firma previa sigue siendo válida', async () => {
     const original = fx('already-signed.pdf')
     const out = await signPdf(original, signer)

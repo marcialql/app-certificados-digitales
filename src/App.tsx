@@ -38,7 +38,7 @@ export default function App() {
     <main>
       <h1>Certificado Digital</h1>
       <nav className="menu-principal">
-        <button type="button" className="menu-boton" onClick={startSigning}>Firmar PDF</button>
+        <button type="button" className="menu-boton" onClick={startSigning}>Firmar un documento</button>
         <button type="button" className="menu-boton" onClick={() => setView('sedes')}>Sedes electrónicas</button>
         <button type="button" className="menu-boton" onClick={() => setView('avisos')}>Avisos</button>
         <button type="button" className="menu-boton" onClick={() => setView('ajustes')}>Ajustes</button>

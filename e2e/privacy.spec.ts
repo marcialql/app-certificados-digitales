@@ -43,14 +43,14 @@ function findLeaks(req: { url: string; body: Buffer | null }): string[] {
 
 async function importCert(page: Page) {
   await page.goto('/')
-  await page.getByRole('button', { name: 'Firmar PDF' }).click()
+  await page.getByRole('button', { name: 'Firmar un documento' }).click()
   await expect(page.getByRole('heading', { name: 'Importar certificado' })).toBeVisible()
   await page.getByLabel('Archivo del certificado').setInputFiles(p12Path)
   await page.getByLabel('Contraseña del certificado').fill(PASSWORD)
   await page.getByLabel('PIN nuevo', { exact: true }).fill(PIN)
   await page.getByLabel('Repite el PIN').fill(PIN)
   await page.getByRole('button', { name: 'Guardar certificado' }).click()
-  await expect(page.getByRole('heading', { name: 'Firmar PDF' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Firmar un documento' })).toBeVisible()
 }
 
 test('ninguna petición contiene el PDF, el .p12, su contraseña ni el PIN', async ({ page, context }) => {

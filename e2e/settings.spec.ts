@@ -6,14 +6,14 @@ const pdfPath = fileURLToPath(new URL('../src/pdf/fixtures/two-page.pdf', import
 
 async function importCert(page: Page) {
   await page.goto('/')
-  await page.getByRole('button', { name: 'Firmar PDF' }).click()
+  await page.getByRole('button', { name: 'Firmar un documento' }).click()
   await expect(page.getByRole('heading', { name: 'Importar certificado' })).toBeVisible()
   await page.getByLabel('Archivo del certificado').setInputFiles(p12Path)
   await page.getByLabel('Contraseña del certificado').fill('test')
   await page.getByLabel('PIN nuevo', { exact: true }).fill('123456')
   await page.getByLabel('Repite el PIN').fill('123456')
   await page.getByRole('button', { name: 'Guardar certificado' }).click()
-  await expect(page.getByRole('heading', { name: 'Firmar PDF' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Firmar un documento' })).toBeVisible()
 }
 
 test('Ajustes borra el certificado tras confirmar y firmar vuelve a pedir importarlo', async ({ page }) => {
@@ -26,8 +26,8 @@ test('Ajustes borra el certificado tras confirmar y firmar vuelve a pedir import
   await page.getByRole('button', { name: 'Borrar certificado / importar otro' }).click()
   await page.getByRole('button', { name: 'Cancelar' }).click()
   await page.getByRole('button', { name: 'Volver' }).click()
-  await page.getByRole('button', { name: 'Firmar PDF' }).click()
-  await expect(page.getByRole('heading', { name: 'Firmar PDF' })).toBeVisible()
+  await page.getByRole('button', { name: 'Firmar un documento' }).click()
+  await expect(page.getByRole('heading', { name: 'Firmar un documento' })).toBeVisible()
   await page.getByRole('button', { name: 'Volver' }).click()
 
   // Confirmar borra y lleva a importar.
@@ -39,7 +39,7 @@ test('Ajustes borra el certificado tras confirmar y firmar vuelve a pedir import
 
   // Desde el inicio, firmar lleva a importar porque ya no hay certificado.
   await page.goto('/')
-  await page.getByRole('button', { name: 'Firmar PDF' }).click()
+  await page.getByRole('button', { name: 'Firmar un documento' }).click()
   await expect(page.getByRole('heading', { name: 'Importar certificado' })).toBeVisible()
 })
 
