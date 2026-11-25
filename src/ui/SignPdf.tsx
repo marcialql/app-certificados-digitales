@@ -5,6 +5,7 @@ import { listCerts, renameCert, type CertEntry } from '../storage/certStore'
 import { signPdf } from '../pdf/pades'
 import { decodeBundle } from './bundle'
 import PinDialog from './PinDialog'
+import VistaPrevia, { type Colocacion } from './VistaPrevia'
 import { chooseDelivery } from './deliver'
 
 type Props = { onBack: () => void; onImport: () => void }
@@ -28,6 +29,7 @@ export default function SignPdf({ onBack, onImport }: Props) {
   const [busy, setBusy] = useState(false)
   const [noCert, setNoCert] = useState(false)
   const [firmado, setFirmado] = useState<File | null>(null)
+  const [colocacion, setColocacion] = useState<Colocacion | null>(null)
   const [modo, setModo] = useState<'ultima' | 'todas'>('ultima')
   const [certs, setCerts] = useState<CertEntry[]>([])
   const [certId, setCertId] = useState('')
@@ -80,7 +82,10 @@ export default function SignPdf({ onBack, onImport }: Props) {
         }
       }
       const pdf = new Uint8Array(await file.arrayBuffer())
-      const signed = await signPdf(pdf, signer, { modo })
+      const signed = await signPdf(pdf, signer, {
+        modo,
+        ...(colocacion ? { page: colocacion.page, rect: colocacion.rect } : {}),
+      })
       const name = file.name.replace(/\.pdf$/i, '') + '-firmado.pdf'
       setAsking(false)
       setFirmado(new File([signed as BlobPart], name, { type: 'application/pdf' }))
@@ -111,6 +116,7 @@ export default function SignPdf({ onBack, onImport }: Props) {
             setMessage('')
             setNoCert(false)
             setFirmado(null)
+            setColocacion(null)
           }}
         />
       </label>
@@ -154,6 +160,7 @@ export default function SignPdf({ onBack, onImport }: Props) {
           En todas las hojas (en el lateral) y al final, junto al pie de firma
         </label>
       </fieldset>
+      {file && <VistaPrevia file={file} modo={modo} onChange={setColocacion} />}
       <button
         type="button"
         disabled={!file}

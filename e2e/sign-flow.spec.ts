@@ -112,3 +112,24 @@ test('si el móvil puede compartir archivos, ofrece la hoja nativa en vez de des
   expect(shared.size).toBeGreaterThan(readFileSync(pdfPath).length)
   expect(downloaded).toBe(false)
 })
+
+test('la vista previa permite tocar el sitio de la firma y el PDF lo respeta', async ({ page }) => {
+  await importCert(page)
+  await page.getByLabel('PDF a firmar').setInputFiles(pdfPath)
+  const lienzo = page.locator('.vista-lienzo canvas')
+  await expect(lienzo).toBeVisible()
+  // Toque cerca del borde izquierdo, arriba: la firma por defecto iría abajo a la derecha.
+  await lienzo.click({ position: { x: 20, y: 20 } })
+  await page.getByRole('button', { name: 'Firmar', exact: true }).click()
+  await page.getByLabel('PIN', { exact: true }).fill('123456')
+  await page.getByRole('button', { name: 'Aceptar' }).click()
+  const downloadPromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Guardar en el móvil' }).click()
+  const download = await downloadPromise
+  const texto = readFileSync(await download.path()).toString('latin1')
+  const m = texto.match(/\/Rect\s*\[\s*([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)\s*\]/)
+  expect(m).not.toBeNull()
+  const x1 = Number(m![1])
+  // Por defecto x1 sería ~379 (A4, margen 36, ancho 180); tocando a la izquierda queda cerca de 0.
+  expect(x1).toBeLessThan(200)
+})
