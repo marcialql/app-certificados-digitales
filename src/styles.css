@@ -139,7 +139,7 @@ button:disabled {
 .ilustracion-inicio {
   display: block;
   width: 100%;
-  max-width: 200px;
+  max-width: 160px;
   height: auto;
   margin: 20px auto 0;
 }
@@ -374,7 +374,7 @@ section section li.sede-item {
 /* Pantallas bajas: la ilustración se reduce para que el inicio quepa sin bajar */
 @media (max-height: 740px) {
   .ilustracion-inicio {
-    max-width: 130px;
+    max-width: 100px;
     margin-top: 12px;
   }
 }
