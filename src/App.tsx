@@ -36,13 +36,15 @@ export default function App() {
 
   return (
     <main>
-      <h1>Certificado Digital</h1>
+      <h1 className="titulo-inicio">Certificado Digital</h1>
       <nav className="menu-principal">
         <button type="button" className="menu-boton" onClick={startSigning}>Firmar un documento</button>
         <button type="button" className="menu-boton" onClick={() => setView('sedes')}>Qué puedo hacer?</button>
         <button type="button" className="menu-boton" onClick={() => setView('avisos')}>Avisos</button>
         <button type="button" className="menu-boton" onClick={() => setView('ajustes')}>Ajustes</button>
       </nav>
+      <img className="ilustracion-inicio" src="/ilustracion-certificado.svg" alt="" />
+      <p className="creditos-pie">Ilustración e iconos originales</p>
     </main>
   )
 }
