@@ -168,9 +168,6 @@ export default function SignPdf({ onBack, onImport }: Props) {
       <button type="button" className="boton-secundario" onClick={onBack}>Salir</button>
       {message && <p role="status">{message}</p>}
       {noCert && <button type="button" onClick={onImport}>Importar certificado</button>}
-      {!noCert && certs.length > 0 && (
-        <button type="button" className="boton-secundario" onClick={onImport}>Importar otro certificado</button>
-      )}
       {toShare && <button type="button" onClick={shareSigned}>Guardar o compartir</button>}
       {asking && (
         <PinDialog
