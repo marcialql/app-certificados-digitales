@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { openBundle, WrongPinError } from '../crypto/vault'
 import { loadSigner } from '../crypto/pkcs12'
-import { listCerts, renameCert, type CertEntry } from '../storage/certStore'
+import { listCerts, loadFirmaImagen, renameCert, type CertEntry } from '../storage/certStore'
 import { signPdf } from '../pdf/pades'
 import { decodeBundle } from './bundle'
 import PinDialog from './PinDialog'
@@ -30,11 +30,25 @@ export default function SignPdf({ onBack, onImport }: Props) {
   const [noCert, setNoCert] = useState(false)
   const [firmado, setFirmado] = useState<File | null>(null)
   const [colocacion, setColocacion] = useState<Colocacion | null>(null)
+  const [firmaJpg, setFirmaJpg] = useState<Uint8Array | null>(null)
+  const [firmaUrl, setFirmaUrl] = useState<string | null>(null)
   const [modo, setModo] = useState<'ultima' | 'todas'>('ultima')
   const [certs, setCerts] = useState<CertEntry[]>([])
   const [certId, setCertId] = useState('')
 
+  // Libera la URL de la imagen de la firma al cambiarla o salir de la pantalla.
+  useEffect(() => () => {
+    if (firmaUrl) URL.revokeObjectURL(firmaUrl)
+  }, [firmaUrl])
+
   useEffect(() => {
+    loadFirmaImagen()
+      .then((bytes) => {
+        if (!bytes) return
+        setFirmaJpg(bytes)
+        setFirmaUrl(URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'image/jpeg' })))
+      })
+      .catch(() => {})
     listCerts()
       .then((lista) => {
         setCerts(lista)
@@ -85,6 +99,7 @@ export default function SignPdf({ onBack, onImport }: Props) {
       const signed = await signPdf(pdf, signer, {
         modo,
         ...(colocacion ? { page: colocacion.page, rect: colocacion.rect } : {}),
+        ...(firmaJpg ? { firmaJpg } : {}),
       })
       const name = file.name.replace(/\.pdf$/i, '') + '-firmado.pdf'
       setAsking(false)
@@ -160,7 +175,7 @@ export default function SignPdf({ onBack, onImport }: Props) {
           En todas las hojas (en el lateral) y al final, junto al pie de firma
         </label>
       </fieldset>
-      {file && <VistaPrevia file={file} modo={modo} onChange={setColocacion} />}
+      {file && <VistaPrevia file={file} modo={modo} onChange={setColocacion} firmaUrl={firmaUrl} />}
       <button
         type="button"
         disabled={!file}

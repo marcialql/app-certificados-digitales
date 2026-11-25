@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { fileURLToPath } from 'node:url'
+import { readFileSync } from 'node:fs'
 
 const p12Path = fileURLToPath(new URL('../src/crypto/fixtures/test-ok.p12', import.meta.url))
 const pdfPath = fileURLToPath(new URL('../src/pdf/fixtures/two-page.pdf', import.meta.url))
@@ -66,4 +67,32 @@ test('sin certificado guardado, la pantalla de firma ofrece importarlo', async (
   await expect(page.getByText('No hay ningún certificado guardado.')).toBeVisible()
   await page.getByRole('button', { name: 'Importar certificado' }).click()
   await expect(page.getByRole('heading', { name: 'Importar certificado' })).toBeVisible()
+})
+
+test('la imagen de la firma se sube en Ajustes y aparece en el PDF firmado', async ({ page }) => {
+  const pngPath = fileURLToPath(new URL('./fixtures/firma-test.png', import.meta.url))
+  const pdfPath2 = fileURLToPath(new URL('../src/pdf/fixtures/two-page.pdf', import.meta.url))
+  await importCert(page)
+  await page.getByRole('button', { name: 'Salir' }).click()
+  await page.getByRole('button', { name: 'Ajustes' }).click()
+  await page.locator('input[type="file"][accept="image/png,image/jpeg"]').setInputFiles(pngPath)
+  await expect(page.getByRole('img', { name: 'Tu firma' })).toBeVisible()
+
+  // Sigue guardada tras recargar.
+  await page.reload()
+  await page.getByRole('button', { name: 'Ajustes' }).click()
+  await expect(page.getByRole('img', { name: 'Tu firma' })).toBeVisible()
+  await page.getByRole('button', { name: 'Salir' }).click()
+
+  await page.getByRole('button', { name: 'Firmar un documento' }).click()
+  await page.getByLabel('PDF a firmar').setInputFiles(pdfPath2)
+  await page.getByRole('button', { name: 'Firmar', exact: true }).click()
+  await page.getByLabel('PIN', { exact: true }).fill('123456')
+  await page.getByRole('button', { name: 'Aceptar' }).click()
+  const downloadPromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Guardar en el móvil' }).click()
+  const download = await downloadPromise
+  const texto = readFileSync(await download.path()).toString('latin1')
+  expect(texto).toContain('/Subtype /Image')
+  expect(texto).toContain('/Im1 ')
 })

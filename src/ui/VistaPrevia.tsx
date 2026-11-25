@@ -20,6 +20,8 @@ type Props = {
   file: File
   modo: 'ultima' | 'todas'
   onChange: (c: Colocacion | null) => void
+  /** Imagen de la firma guardada, si la hay: se ve a la izquierda dentro del recuadro. */
+  firmaUrl?: string | null
 }
 
 type Vista = { x0: number; y0: number; w: number; h: number }
@@ -36,7 +38,7 @@ function rectLateral(v: Vista): [number, number, number, number] {
   return [x1, y1, x1 + LATERAL_W, y1 + LATERAL_H]
 }
 
-export default function VistaPrevia({ file, modo, onChange }: Props) {
+export default function VistaPrevia({ file, modo, onChange, firmaUrl }: Props) {
   const [doc, setDoc] = useState<pdfjs.PDFDocumentProxy | null>(null)
   const [numPaginas, setNumPaginas] = useState(0)
   const [pagina, setPagina] = useState(0)
@@ -156,7 +158,10 @@ export default function VistaPrevia({ file, modo, onChange }: Props) {
           <div className="vista-lateral" style={lateral} aria-hidden="true" />
         )}
         {listo && firma && (
-          <div className="vista-firma" style={firma} aria-hidden="true">Firma</div>
+          <div className={firmaUrl ? 'vista-firma con-imagen' : 'vista-firma'} style={firma} aria-hidden="true">
+            {firmaUrl && <img className="vista-firma-img" src={firmaUrl} alt="" />}
+            Firma
+          </div>
         )}
       </div>
       {listo && (

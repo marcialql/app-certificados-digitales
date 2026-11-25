@@ -79,7 +79,7 @@ describe('certStore', () => {
       req.onsuccess = () => resolve(req.result)
       req.onerror = () => reject(req.error)
     })
-    expect(Array.from(db.objectStoreNames)).toEqual(['certs'])
+    expect(Array.from(db.objectStoreNames).sort()).toEqual(['ajustes', 'certs'])
     db.close()
   })
 

@@ -60,6 +60,8 @@ export type SignPdfOptions = {
    * 'todas': además, un sello lateral en cada hoja.
    */
   modo?: 'ultima' | 'todas'
+  /** Imagen JPEG de la firma manuscrita: se dibuja a la izquierda del detalle, dentro del sello. */
+  firmaJpg?: Uint8Array
 }
 
 const asn1 = forge.asn1
@@ -282,7 +284,10 @@ function fitText(font: StandardFontEmbedder, text: string, size: number, maxWidt
   return `${t}...`
 }
 
-function appearanceContent(font: StandardFontEmbedder, w: number, h: number, lines: string[]): string {
+/** Zona de la imagen de la firma dentro del sello (a la izquierda, sin tocar el borde). */
+const IMG_AREA = { x: 4, w: 48 }
+
+function appearanceContent(font: StandardFontEmbedder, w: number, h: number, lines: string[], textX = 5): string {
   const size = Math.max(5, Math.min(8, (h - 8) / (lines.length * 1.25)))
   const leading = size * 1.25
   const ops = [
@@ -290,14 +295,26 @@ function appearanceContent(font: StandardFontEmbedder, w: number, h: number, lin
     `0.4 0.4 ${(w - 0.8).toFixed(2)} ${(h - 0.8).toFixed(2)} re S Q`,
     'BT 0.1 0.1 0.1 rg',
     `/F1 ${size.toFixed(2)} Tf ${leading.toFixed(2)} TL`,
-    `5 ${(h - 4 - size).toFixed(2)} Td`,
+    `${textX} ${(h - 4 - size).toFixed(2)} Td`,
   ]
   lines.forEach((line, i) => {
-    const safe = fitText(font, winAnsiSafe(font, line), size, w - 10)
+    const safe = fitText(font, winAnsiSafe(font, line), size, w - textX - 5)
     ops.push(`${i === 0 ? '' : 'T* '}${font.encodeText(safe).toString()} Tj`)
   })
   ops.push('ET')
   return ops.join('\n')
+}
+
+/** Dibuja la imagen de la firma, escalada y centrada en su zona a la izquierda del sello. */
+function firmaImageOps(name: string, iw: number, ih: number, h: number): string {
+  const areaW = IMG_AREA.w
+  const areaH = h - 8
+  const escala = Math.min(areaW / iw, areaH / ih)
+  const dw = iw * escala
+  const dh = ih * escala
+  const x = IMG_AREA.x + (areaW - dw) / 2
+  const y = 4 + (areaH - dh) / 2
+  return `q ${dw.toFixed(2)} 0 0 ${dh.toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)} cm /${name} Do Q`
 }
 
 /** Texto del sello lateral: una sola línea, girada 90° para leerla de abajo arriba. */
@@ -414,11 +431,31 @@ export async function signPdf(pdf: Uint8Array, signer: Signer, opts: SignPdfOpti
   const cn = signer.certificate.subject.getField('CN')?.value ?? ''
   const lines = ['Firmado digitalmente por', cn, `Fecha: ${humanDate(now)}`]
   if (opts.reason) lines.push(`Motivo: ${opts.reason}`)
-  const ap = ctx.stream(appearanceContent(font, w, h, lines), {
+  // Imagen de la firma manuscrita (JPEG): va a la izquierda y el texto se desplaza.
+  let imagenRef: PDFRef | null = null
+  let imagenOps = ''
+  let textX = 5
+  if (opts.firmaJpg) {
+    let img
+    try {
+      img = await doc.embedJpg(opts.firmaJpg)
+      await img.embed() // pdf-lib incrusta la imagen de forma diferida; aquí queda en el contexto
+    } catch {
+      throw new PdfSignError('La imagen de la firma no es válida. Vuelve a subirla desde Ajustes.')
+    }
+    imagenRef = img.ref
+    updates.set(imagenRef, ctx.lookup(imagenRef) as PDFObject)
+    imagenOps = firmaImageOps('Im1', img.width, img.height, h)
+    textX = IMG_AREA.x + IMG_AREA.w + 4
+  }
+  const contenido = appearanceContent(font, w, h, lines, textX) + (imagenOps ? `\n${imagenOps}` : '')
+  const ap = ctx.stream(contenido, {
     Type: 'XObject',
     Subtype: 'Form',
     BBox: [0, 0, w, h],
-    Resources: { Font: { F1: fontRef } },
+    Resources: imagenRef
+      ? { Font: { F1: fontRef }, XObject: { Im1: imagenRef } }
+      : { Font: { F1: fontRef } },
   })
   ctx.assign(apRef, ap)
 
