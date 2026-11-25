@@ -31,7 +31,7 @@ export default function PinDialog({ onSubmit, onCancel, error }: Props) {
         </label>
         {error && <p role="alert">{error}</p>}
         <button type="submit">Aceptar</button>
-        <button type="button" onClick={onCancel}>Cancelar</button>
+        <button type="button" className="boton-secundario" onClick={onCancel}>Cancelar</button>
       </form>
     </div>
   )

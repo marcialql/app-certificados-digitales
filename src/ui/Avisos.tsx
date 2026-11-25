@@ -44,7 +44,7 @@ export default function Avisos({ onBack }: { onBack?: () => void }) {
         <button type="button" onClick={activar} disabled={busy}>Activar avisos</button>
       )}
       {error && <p role="alert">{error}</p>}
-      {onBack && <button type="button" onClick={onBack}>Volver</button>}
+      {onBack && <button type="button" className="boton-secundario" onClick={onBack}>Volver</button>}
     </section>
   )
 }

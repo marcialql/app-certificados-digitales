@@ -24,18 +24,18 @@ export default function Ajustes({ onBack, onDeleted }: Props) {
     <section>
       <h2>Ajustes</h2>
       {!confirming ? (
-        <button type="button" onClick={() => setConfirming(true)}>
+        <button type="button" className="boton-peligro" onClick={() => setConfirming(true)}>
           Borrar certificado / importar otro
         </button>
       ) : (
         <div role="alertdialog" aria-label="Confirmar borrado">
           <p>¿Borrar el certificado de este móvil? Tendrás que importarlo otra vez para firmar.</p>
-          <button type="button" disabled={busy} onClick={handleDelete}>Sí, borrar</button>
-          <button type="button" disabled={busy} onClick={() => setConfirming(false)}>Cancelar</button>
+          <button type="button" className="boton-peligro" disabled={busy} onClick={handleDelete}>Sí, borrar</button>
+          <button type="button" className="boton-secundario" disabled={busy} onClick={() => setConfirming(false)}>Cancelar</button>
         </div>
       )}
       {error && <p role="alert">{error}</p>}
-      <button type="button" onClick={onBack}>Volver</button>
+      <button type="button" className="boton-secundario" onClick={onBack}>Volver</button>
     </section>
   )
 }

@@ -37,11 +37,11 @@ export default function App() {
   return (
     <main>
       <h1>Firma PDF</h1>
-      <nav>
-        <button type="button" onClick={startSigning}>Firmar PDF</button>
-        <button type="button" onClick={() => setView('sedes')}>Sedes electrónicas</button>
-        <button type="button" onClick={() => setView('avisos')}>Avisos</button>
-        <button type="button" onClick={() => setView('ajustes')}>Ajustes</button>
+      <nav className="menu-principal">
+        <button type="button" className="menu-boton" onClick={startSigning}>Firmar PDF</button>
+        <button type="button" className="menu-boton" onClick={() => setView('sedes')}>Sedes electrónicas</button>
+        <button type="button" className="menu-boton" onClick={() => setView('avisos')}>Avisos</button>
+        <button type="button" className="menu-boton" onClick={() => setView('ajustes')}>Ajustes</button>
       </nav>
     </main>
   )
