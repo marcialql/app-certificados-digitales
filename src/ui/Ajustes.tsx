@@ -35,7 +35,7 @@ export default function Ajustes({ onBack, onDeleted }: Props) {
         </div>
       )}
       {error && <p role="alert">{error}</p>}
-      <button type="button" className="boton-secundario" onClick={onBack}>Volver</button>
+      <button type="button" className="boton-secundario" onClick={onBack}>Salir</button>
     </section>
   )
 }

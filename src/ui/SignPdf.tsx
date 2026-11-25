@@ -132,7 +132,7 @@ export default function SignPdf({ onBack, onImport }: Props) {
       >
         Firmar
       </button>
-      <button type="button" className="boton-secundario" onClick={onBack}>Volver</button>
+      <button type="button" className="boton-secundario" onClick={onBack}>Salir</button>
       {message && <p role="status">{message}</p>}
       {noCert && <button type="button" onClick={onImport}>Importar certificado</button>}
       {toShare && <button type="button" onClick={shareSigned}>Guardar o compartir</button>}

@@ -4,9 +4,9 @@ import { loadSigner } from '../crypto/pkcs12'
 import { saveVault } from '../storage/certStore'
 import { encodeBundle } from './bundle'
 
-type Props = { onDone: () => void }
+type Props = { onDone: () => void; onBack?: () => void }
 
-export default function ImportCertificate({ onDone }: Props) {
+export default function ImportCertificate({ onDone, onBack }: Props) {
   const [file, setFile] = useState<File | null>(null)
   const [password, setPassword] = useState('')
   const [pin, setPin] = useState('')
@@ -82,6 +82,7 @@ export default function ImportCertificate({ onDone }: Props) {
         {error && <p role="alert">{error}</p>}
         <button type="submit" disabled={busy}>Guardar certificado</button>
       </form>
+      {onBack && <button type="button" className="boton-secundario" onClick={onBack}>Salir</button>}
     </section>
   )
 }

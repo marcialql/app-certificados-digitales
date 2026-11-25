@@ -66,7 +66,7 @@ export default function Sedes({ onBack }: { onBack?: () => void }) {
   return (
     <section>
       <h1>Sedes electrónicas</h1>
-      {onBack && <button type="button" className="boton-secundario" onClick={onBack}>Volver</button>}
+      {onBack && <button type="button" className="boton-secundario" onClick={onBack}>Salir</button>}
       <label>
         Buscar sede
         <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} />

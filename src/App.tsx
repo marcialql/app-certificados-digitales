@@ -10,6 +10,14 @@ type View = 'home' | 'import' | 'sign' | 'sedes' | 'avisos' | 'ajustes'
 
 export default function App() {
   const [view, setView] = useState<View>('home')
+  const [aviso, setAviso] = useState('')
+
+  // Un navegador solo deja cerrar las ventanas que él mismo abrió; si no lo consigue, se avisa.
+  function cerrarApp() {
+    setAviso('')
+    window.close()
+    setTimeout(() => setAviso('Para cerrar la app, ciérrala desde el gestor de apps de tu móvil.'), 300)
+  }
 
   async function startSigning() {
     let hasVault = false
@@ -21,7 +29,7 @@ export default function App() {
     setView(hasVault ? 'sign' : 'import')
   }
 
-  if (view === 'import') return <main><ImportCertificate onDone={() => setView('sign')} /></main>
+  if (view === 'import') return <main><ImportCertificate onDone={() => setView('sign')} onBack={() => setView('home')} /></main>
   if (view === 'sign') {
     return <main><SignPdf onBack={() => setView('home')} onImport={() => setView('import')} /></main>
   }
@@ -37,11 +45,13 @@ export default function App() {
   return (
     <main>
       <h1 className="titulo-inicio">Certificado Digital</h1>
+      {aviso && <p role="status">{aviso}</p>}
       <nav className="menu-principal">
         <button type="button" className="menu-boton" onClick={startSigning}>Firmar un documento</button>
         <button type="button" className="menu-boton" onClick={() => setView('sedes')}>Qué puedo hacer?</button>
         <button type="button" className="menu-boton" onClick={() => setView('avisos')}>Avisos</button>
         <button type="button" className="menu-boton" onClick={() => setView('ajustes')}>Ajustes</button>
+        <button type="button" className="menu-boton" onClick={cerrarApp}>Salir</button>
       </nav>
       <img className="ilustracion-inicio" src="/ilustracion-certificado.svg" alt="" />
       <p className="creditos-pie">Ilustración e iconos originales</p>

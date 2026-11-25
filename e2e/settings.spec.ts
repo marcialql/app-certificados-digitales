@@ -18,17 +18,17 @@ async function importCert(page: Page) {
 
 test('Ajustes borra el certificado tras confirmar y firmar vuelve a pedir importarlo', async ({ page }) => {
   await importCert(page)
-  await page.getByRole('button', { name: 'Volver' }).click()
+  await page.getByRole('button', { name: 'Salir' }).click()
 
   // Cancelar no borra nada.
   await page.getByRole('button', { name: 'Ajustes' }).click()
   await expect(page.getByRole('heading', { name: 'Ajustes' })).toBeVisible()
   await page.getByRole('button', { name: 'Borrar certificado / importar otro' }).click()
   await page.getByRole('button', { name: 'Cancelar' }).click()
-  await page.getByRole('button', { name: 'Volver' }).click()
+  await page.getByRole('button', { name: 'Salir' }).click()
   await page.getByRole('button', { name: 'Firmar un documento' }).click()
   await expect(page.getByRole('heading', { name: 'Firmar un documento' })).toBeVisible()
-  await page.getByRole('button', { name: 'Volver' }).click()
+  await page.getByRole('button', { name: 'Salir' }).click()
 
   // Confirmar borra y lleva a importar.
   await page.getByRole('button', { name: 'Ajustes' }).click()
