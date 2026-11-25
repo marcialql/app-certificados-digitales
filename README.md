@@ -1,8 +1,9 @@
 # Firma PDF con certificado digital (PWA)
 
 PWA para firmar PDF con firma PAdES usando un certificado `.p12`/`.pfx`. Todo el
-procesado de PDF y certificados ocurre en el navegador; el servidor solo sirve la app
-y envía avisos push. Diseño y plan completos en `docs/superpowers/`.
+procesado de PDF y certificados ocurre en el navegador; el servidor solo sirve la app.
+Los avisos se retiraron: quien quiera notificaciones electrónicas debe darse de alta
+en el Punto de Acceso General (DEHú). Diseño y plan completos en `docs/superpowers/`.
 
 Proyecto movido desde `~/Downloads/firma-pdf-codigo` el 2026-11-25.
 
@@ -11,7 +12,7 @@ Proyecto movido desde `~/Downloads/firma-pdf-codigo` el 2026-11-25.
 ```bash
 npm ci                  # instalar dependencias
 npm run dev             # desarrollo (Vite)
-npx vitest run          # pruebas unitarias y de servidor (68)
+npx vitest run          # pruebas unitarias y de servidor (46)
 npm run build           # build de producción + service worker
 npm run lint            # oxlint
 npx playwright install chromium   # una vez, si no está instalado
@@ -24,7 +25,7 @@ Para usar otro binario de Chromium en Playwright: `CHROMIUM_PATH=/ruta/al/binari
 
 | Tarea del plan | Estado |
 |---|---|
-| 1–10 (andamiaje, cifrado con PIN, PKCS#12, IndexedDB, firma PAdES, flujos, sedes, backend, avisos, privacidad) | Implementadas; pruebas unitarias y E2E en verde |
+| 1–10 (andamiaje, cifrado con PIN, PKCS#12, IndexedDB, firma PAdES, flujos, sedes, backend, privacidad) | Implementadas; pruebas unitarias en verde. Avisos (tarea 9) retirados el 2026-11-25 |
 | 5 verificación externa con OpenSSL / pdfsig | Documentada en `src/pdf/fixtures/README.md` |
 | 11 despliegue en VPS | **Pendiente**: falta dominio y acceso SSH |
 | 12 aceptación en iPhone y Android reales | **Pendiente**: prueba manual |

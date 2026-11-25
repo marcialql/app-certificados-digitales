@@ -45,9 +45,9 @@
   {
     "id": "administracion",
     "nombre": "Punto de Acceso General",
-    "descripcion": "Puerta de entrada a trámites de todas las administraciones españolas.",
+    "descripcion": "Alta para recibir notificaciones electrónicas (DEHú) y puerta de entrada a trámites de todas las administraciones.",
     "categoria": "General",
-    "url": "https://administracion.gob.es/"
+    "url": "https://administracion.gob.es/tramites-electronicos/notificaciones"
   },
   {
     "id": "ayuntamientos",

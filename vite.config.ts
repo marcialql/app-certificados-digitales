@@ -9,7 +9,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      // Service worker propio (src/sw.ts) para mostrar los avisos push.
+      // Service worker propio (src/sw.ts): solo precaché de la app.
       strategies: 'injectManifest',
       srcDir: 'src',
       filename: 'sw.ts',

@@ -3,10 +3,9 @@ import { loadVault } from './storage/certStore'
 import ImportCertificate from './ui/ImportCertificate'
 import SignPdf from './ui/SignPdf'
 import Sedes from './ui/Sedes'
-import Avisos from './ui/Avisos'
 import Ajustes from './ui/Ajustes'
 
-type View = 'home' | 'import' | 'sign' | 'sedes' | 'avisos' | 'ajustes'
+type View = 'home' | 'import' | 'sign' | 'sedes' | 'ajustes'
 
 export default function App() {
   const [view, setView] = useState<View>('home')
@@ -28,8 +27,6 @@ export default function App() {
 
   if (view === 'sedes') return <main><Sedes onBack={() => setView('home')} /></main>
 
-  if (view === 'avisos') return <main><Avisos onBack={() => setView('home')} /></main>
-
   if (view === 'ajustes') {
     return <main><Ajustes onBack={() => setView('home')} onDeleted={() => setView('import')} /></main>
   }
@@ -40,7 +37,6 @@ export default function App() {
       <nav className="menu-principal">
         <button type="button" className="menu-boton" onClick={startSigning}>Firmar un documento</button>
         <button type="button" className="menu-boton" onClick={() => setView('sedes')}>Qué puedo hacer?</button>
-        <button type="button" className="menu-boton" onClick={() => setView('avisos')}>Avisos</button>
         <button type="button" className="menu-boton" onClick={() => setView('ajustes')}>Ajustes</button>
       </nav>
       <img className="ilustracion-inicio" src="/ilustracion-certificado.svg" alt="" />

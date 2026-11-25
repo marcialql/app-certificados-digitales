@@ -139,9 +139,9 @@ button:disabled {
 .ilustracion-inicio {
   display: block;
   width: 100%;
-  max-width: 120px;
+  max-width: 340px;
   height: auto;
-  margin: 16px auto 0;
+  margin: 24px auto 0;
 }
 
 .menu-boton {
@@ -267,7 +267,7 @@ ul {
   margin: 0;
 }
 
-/* Estado de avisos y otros textos */
+/* Textos de las pantallas */
 section > p:first-of-type {
   padding: 12px 14px;
   border-radius: 12px;
@@ -374,7 +374,7 @@ section section li.sede-item {
 /* Pantallas bajas: la ilustración se reduce para que el inicio quepa sin bajar */
 @media (max-height: 740px) {
   .ilustracion-inicio {
-    max-width: 80px;
-    margin-top: 10px;
+    max-width: 240px;
+    margin-top: 12px;
   }
 }

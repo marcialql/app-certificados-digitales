@@ -1,5 +1,5 @@
 [Unit]
-Description=ionos-app (firma-pdf PWA y API de notificaciones)
+Description=ionos-app (firma-pdf PWA)
 After=network.target
 
 [Service]
@@ -7,9 +7,6 @@ Type=simple
 User=ionos-app
 Group=ionos-app
 WorkingDirectory=/opt/ionos-app
-# Secretos y configuración fuera del repositorio (VAPID_PUBLIC, VAPID_PRIVATE,
-# VAPID_SUBJECT, ADMIN_TOKEN, SUBS_FILE). Ver deploy/README.md.
-EnvironmentFile=/etc/ionos-app/env
 Environment=NODE_ENV=production
 Environment=PORT=3000
 ExecStart=/usr/bin/npm run server
